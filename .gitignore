@@ -1,5 +1,5 @@
 # Variables d'environnement (secrets) — ne pas versionner
-/.env
+.env
 
 # Métadonnées outil / IDE
 /.claude/
