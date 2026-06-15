@@ -1,0 +1,83 @@
+<div class="card m-3">
+  <h5 class="card-header header-bar">
+    <span>Gestion des étudiants</span>
+    <button class="btn btn-secondary btn-sm" (click)="logout()">Déconnexion</button>
+  </h5>
+  <div class="card-body">
+
+    <!-- Formulaire d'ajout / modification -->
+    <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
+      <h6>{{ editingId ? 'Modifier' : 'Ajouter' }} un étudiant</h6>
+      <div class="fields">
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" formControlName="firstName" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }" />
+        </div>
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" formControlName="lastName" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && form['email'].errors }" />
+        </div>
+      </div>
+      @if (submitted && studentForm.invalid) {
+        <div class="text-danger">Prénom, nom et email valide sont requis.</div>
+      }
+      <div class="actions">
+        <button class="btn btn-primary" [disabled]="loading">
+          {{ editingId ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        @if (editingId) {
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">Annuler</button>
+        }
+      </div>
+    </form>
+
+    <hr />
+
+    <!-- États -->
+    @if (loading) {
+      <p>Chargement...</p>
+    }
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+
+    <!-- Liste des étudiants -->
+    @if (!loading && students.length === 0) {
+      <p>Aucun étudiant pour le moment.</p>
+    }
+    @if (students.length > 0) {
+      <table class="students-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of students; track student.id) {
+            <tr>
+              <td>{{ student.id }}</td>
+              <td>{{ student.firstName }}</td>
+              <td>{{ student.lastName }}</td>
+              <td>{{ student.email }}</td>
+              <td class="actions">
+                <button class="btn btn-primary btn-sm" (click)="onEdit(student)">Modifier</button>
+                <button class="btn btn-danger btn-sm" (click)="onDelete(student)">Supprimer</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

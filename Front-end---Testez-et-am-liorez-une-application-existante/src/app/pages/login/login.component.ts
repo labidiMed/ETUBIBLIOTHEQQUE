@@ -1,8 +1,10 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
+import { AuthService } from '../../core/service/auth.service';
 import { Login } from '../../core/models/Login';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -15,7 +17,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class LoginComponent implements OnInit {
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
@@ -60,6 +64,9 @@ export class LoginComponent implements OnInit {
         next: (token: string) => {
           this.token = token;
           this.loading = false;
+          // Stocke le token puis redirige vers l'ecran de gestion des etudiants
+          this.authService.setToken(token);
+          this.router.navigate(['/students']);
         },
         error: (err) => {
           this.loading = false;
