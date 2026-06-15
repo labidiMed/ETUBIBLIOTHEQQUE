@@ -1,0 +1,69 @@
+<div class="card m-3">
+  <h5 class="card-header">Authentification</h5>
+  <div class="card-body">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Login</label>
+        <input
+          type="text"
+          formControlName="login"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && form['login'].errors }"
+        />
+        @if (submitted && form['login'].errors) {
+          <div class="invalid-feedback">
+            @if (form['login'].errors?.['required']) {
+              <div>Login is required</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
+        />
+        @if (submitted && form['password'].errors) {
+          <div class="invalid-feedback">
+            @if (form['password'].errors?.['required']) {
+              <div>Password is required</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-primary mr-1" [disabled]="loading">
+          @if (loading) { Connexion... } @else { Login }
+        </button>
+        <button class="btn btn-secondary" type="reset" (click)="onReset()" [disabled]="loading">
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    <!-- État : chargement -->
+    @if (loading) {
+      <p class="mt-3">Authentification en cours...</p>
+    }
+
+    <!-- État : erreur (les erreurs serveur s'affichent) -->
+    @if (errorMessage) {
+      <div class="alert alert-danger mt-3" role="alert">
+        Échec de l'authentification : {{ errorMessage }}
+      </div>
+    }
+
+    <!-- État : succès (token JWT reçu) -->
+    @if (token) {
+      <div class="alert alert-success mt-3" role="alert">
+        <strong>Authentification réussie !</strong> Token JWT reçu :
+        <p style="word-break: break-all;">{{ token }}</p>
+      </div>
+    }
+  </div>
+</div>
