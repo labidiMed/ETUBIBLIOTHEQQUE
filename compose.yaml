@@ -1,0 +1,64 @@
+services:
+  # Base de données MySQL (indispensable au back-end)
+  mysql:
+    image: mysql:8.4
+    container_name: etu-mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${DB_ROOT_PASSWORD} --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Conteneur back-end (Spring Boot / Java 21)
+  backend:
+    build:
+      context: ./Back-end---Testez-et-am-liorez-une-application-existante
+    container_name: etu-backend
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      # Desactive l'integration Spring Boot Docker Compose (pas de Docker dans le conteneur)
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Conteneur front-end (Angular build statique servi par nginx, proxy /api -> backend)
+  frontend:
+    build:
+      context: ./Front-end---Testez-et-am-liorez-une-application-existante
+    container_name: etu-frontend
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

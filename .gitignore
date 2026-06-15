@@ -1,0 +1,6 @@
+# Variables d'environnement (secrets) — ne pas versionner
+/.env
+
+# Métadonnées outil / IDE
+/.claude/
+.vscode/
