@@ -1,0 +1,27 @@
+services:
+  backend-test:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: etu-backend-test
+    working_dir: /app
+    volumes:
+      - ./Back-end---Testez-et-am-liorez-une-application-existante:/app
+      - maven-repo:/root/.m2
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["mvn", "-B", "verify"]
+
+  frontend-test:
+    image: node:20
+    container_name: etu-frontend-test
+    working_dir: /app
+    volumes:
+      - ./Front-end---Testez-et-am-liorez-une-application-existante:/app
+      - /app/node_modules
+    command: ["sh", "-c", "npm ci && npm test"]
+
+volumes:
+  maven-repo:
